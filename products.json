@@ -1,8 +1,8 @@
 [
     {
-        "name": "еее",
-        "price": 100,
-        "link": "",
-        "image": "data/products/1754551264144.jpg"
+        "name": "Привет тестер!",
+        "price": 500,
+        "link": "https://firebase.google.com/static/images/social.png?hl=id",
+        "image": "https://firebase.google.com/static/images/social.png?hl=id"
     }
 ]
