@@ -1,8 +1,20 @@
 [
-    {
-        "name": "Привет тестер!",
-        "price": 500,
-        "link": "https://firebase.google.com/static/images/social.png?hl=id",
-        "image": "https://firebase.google.com/static/images/social.png?hl=id"
-    }
+  {
+    "name": "Наушники XYZ",
+    "price": 1990,
+    "link": "https://wildberries.ru/product/xyz",
+    "image": "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/headphones.jpg"
+  },
+  {
+    "name": "Смартфон ABC",
+    "price": 22990,
+    "link": "https://example.com/abc",
+    "image": "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/smartphone.jpg"
+  },
+  {
+    "name": "Пауэрбанк 10000 mAh",
+    "price": 1490,
+    "link": "https://example.com/powerbank",
+    "image": "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/powerbank.jpg"
+  }
 ]
