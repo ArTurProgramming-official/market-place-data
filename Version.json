@@ -1,4 +1,5 @@
 {
-  "version": "1.2",
-  "update_link": "https://example.com/app_latest.apk"
+    "version": "1.2",
+    "download_url": "https://example.com/download/latest.apk",
+    "changelog": "Исправления ошибок"
 }
