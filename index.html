@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArturProgramming Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Загрузка */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #1976d2;
+        }
+
+        .loading-spinner {
+            font-size: 40px;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Навигация */
+        .bottom-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: #1976d2;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        /* Контент */
+        .content {
+            padding-bottom: 80px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Карточки товаров */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 2px solid #bbdefb;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1565c0;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: #e53935;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        /* Новости */
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+            border: 2px solid #bbdefb;
+            transition: transform 0.3s;
+        }
+
+        .news-card:hover {
+            transform: translateX(5px);
+        }
+
+        .news-title {
+            font-weight: 600;
+            font-size: 18px;
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        /* Кнопки */
+        .refresh-btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: background 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #1565c0;
+        }
+
+        .refresh-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-text {
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .modal-btn.primary {
+            background: #1976d2;
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        /* О нас */
+        .about-content {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .about-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 16px;
+        }
+
+        .about-version {
+            font-size: 18px;
+            color: #1976d2;
+            margin-bottom: 24px;
+        }
+
+        .about-link {
+            display: inline-block;
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 12px 24px;
+            border: 2px solid #1976d2;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .about-link:hover {
+            background: #1976d2;
+            color: white;
+        }
+
+        /* Ошибки */
+        .error-message {
+            text-align: center;
+            color: #d32f2f;
+            padding: 20px;
+            background: #ffebee;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Контент вкладок -->
+        <div class="content">
+            <!-- Товары -->
+            <div id="products-tab" class="tab-content active">
+                <button class="refresh-btn" onclick="loadProducts()" id="refresh-products">
+                    <i class="fas fa-sync"></i> Обновить
+                </button>
+                <div id="products-loading" class="loading">
+                    <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                    <p>Загрузка товаров...</p>
+                </div>
+                <div id="products-error" class="error-message" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ошибка загрузки товаров</p>
+                </div>
+                <div id="products-grid" class="products-grid" style="display: none;">
+                    <!-- Товары будут загружены через JavaScript -->
+                </div>
+            </div>
+
+            <!-- Новости -->
+            <div id="news-tab" class="tab-content">
+                <button class="refresh-btn" onclick="loadNews()" id="refresh-news">
+                    <i class="fas fa-sync"></i> Обновить
+                </button>
+                <div id="news-loading" class="loading">
+                    <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                    <p>Загрузка новостей...</p>
+                </div>
+                <div id="news-error" class="error-message" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ошибка загрузки новостей</p>
+                </div>
+                <div id="news-list" class="news-list" style="display: none;">
+                    <!-- Новости будут загружены через JavaScript -->
+                </div>
+            </div>
+
+            <!-- О нас -->
+            <div id="about-tab" class="tab-content">
+                <div class="about-content">
+                    <h1 class="about-title">ArturProgramming Home</h1>
+                    <p class="about-version">Версия 1.1</p>
+                    <a href="https://t.me/ArturProgrammer" class="about-link" target="_blank">
+                        <i class="fab fa-telegram"></i> Канал: https://t.me/ArturProgrammer
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Навигация -->
+        <div class="bottom-navigation">
+            <a href="#" class="nav-item active" onclick="switchTab('products')">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Товары</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('news')">
+                <i class="fas fa-newspaper"></i>
+                <span>Новости</span>
+            </a>
+            <a href="#" class="nav-item" onclick="switchTab('about')">
+                <i class="fas fa-info-circle"></i>
+                <span>О нас</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <h2 id="modal-title" class="modal-title"></h2>
+            <img id="modal-image" class="modal-image" src="" alt="" style="display: none;">
+            <p id="modal-text" class="modal-text"></p>
+            <div class="modal-buttons">
+                <button id="modal-link-btn" class="modal-btn primary" style="display: none;">Перейти по ссылке</button>
+                <button class="modal-btn secondary" onclick="closeModal()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GITHUB_BASE = "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/";
+        const CURRENT_VERSION = "1.1";
+
+        let products = [];
+        let news = [];
+
+        // Функции переключения вкладок
+        function switchTab(tabName) {
+            // Скрыть все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показать выбранную вкладку
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Обновить навигацию
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.nav-item:nth-child(${getTabIndex(tabName)})`).classList.add('active');
+        }
+
+        function getTabIndex(tabName) {
+            const tabs = ['products', 'news', 'about'];
+            return tabs.indexOf(tabName) + 1;
+        }
+
+        // Загрузка товаров с GitHub
+        async function loadProducts() {
+            const refreshBtn = document.getElementById('refresh-products');
+            const loading = document.getElementById('products-loading');
+            const error = document.getElementById('products-error');
+            const grid = document.getElementById('products-grid');
+
+            refreshBtn.disabled = true;
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            grid.style.display = 'none';
+
+            try {
+                const response = await fetch(`${GITHUB_BASE}products.json`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                products = await response.json();
+                displayProducts();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки товаров:', error);
+                error.style.display = 'block';
+                error.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ошибка загрузки товаров</p>
+                    <small>${error.message}</small>
+                `;
+            } finally {
+                loading.style.display = 'none';
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // Отображение товаров
+        function displayProducts() {
+            const grid = document.getElementById('products-grid');
+            const error = document.getElementById('products-error');
+            
+            grid.innerHTML = '';
+            
+            if (products.length === 0) {
+                error.style.display = 'block';
+                error.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <p>Товары не найдены</p>
+                `;
+                grid.style.display = 'none';
+                return;
+            }
+            
+            error.style.display = 'none';
+            grid.style.display = 'grid';
+            
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card fade-in';
+                card.onclick = () => showProductDetail(product);
+                
+                card.innerHTML = `
+                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.style.display='none'">` : ''}
+                    <h3 class="product-name">${product.name}</h3>
+                    <div class="product-price">${product.price || 'Цена не указана'} ₽</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Загрузка новостей с GitHub
+        async function loadNews() {
+            const refreshBtn = document.getElementById('refresh-news');
+            const loading = document.getElementById('news-loading');
+            const error = document.getElementById('news-error');
+            const list = document.getElementById('news-list');
+
+            refreshBtn.disabled = true;
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            list.style.display = 'none';
+
+            try {
+                const response = await fetch(`${GITHUB_BASE}news.json`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                news = await response.json();
+                displayNews();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки новостей:', error);
+                error.style.display = 'block';
+                error.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ошибка загрузки новостей</p>
+                    <small>${error.message}</small>
+                `;
+            } finally {
+                loading.style.display = 'none';
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // Отображение новостей
+        function displayNews() {
+            const list = document.getElementById('news-list');
+            const error = document.getElementById('news-error');
+            
+            list.innerHTML = '';
+            
+            if (news.length === 0) {
+                error.style.display = 'block';
+                error.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <p>Новости не найдены</p>
+                `;
+                list.style.display = 'none';
+                return;
+            }
+            
+            error.style.display = 'none';
+            list.style.display = 'flex';
+            
+            news.forEach(newsItem => {
+                const card = document.createElement('div');
+                card.className = 'news-card fade-in';
+                card.onclick = () => showNewsDetail(newsItem);
+                
+                card.innerHTML = `
+                    <h3 class="news-title">${newsItem.title}</h3>
+                `;
+                
+                list.appendChild(card);
+            });
+        }
+
+        // Модальное окно
+        function showProductDetail(product) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const image = document.getElementById('modal-image');
+            const text = document.getElementById('modal-text');
+            const linkBtn = document.getElementById('modal-link-btn');
+            
+            title.textContent = product.name;
+            text.textContent = product.description || 'Описание отсутствует';
+            
+            if (product.image) {
+                image.src = product.image;
+                image.style.display = 'block';
+                image.onerror = () => image.style.display = 'none';
+            } else {
+                image.style.display = 'none';
+            }
+            
+            if (product.link) {
+                linkBtn.style.display = 'block';
+                linkBtn.onclick = () => window.open(product.link, '_blank');
+            } else {
+                linkBtn.style.display = 'none';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function showNewsDetail(newsItem) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const image = document.getElementById('modal-image');
+            const text = document.getElementById('modal-text');
+            const linkBtn = document.getElementById('modal-link-btn');
+            
+            title.textContent = newsItem.title;
+            text.textContent = newsItem.content || 'Содержание отсутствует';
+            
+            if (newsItem.image) {
+                image.src = newsItem.image;
+                image.style.display = 'block';
+                image.onerror = () => image.style.display = 'none';
+            } else {
+                image.style.display = 'none';
+            }
+            
+            linkBtn.style.display = 'none';
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Проверка обновлений
+        async function checkForUpdates() {
+            try {
+                const response = await fetch(`${GITHUB_BASE}version.json`);
+                if (response.ok) {
+                    const versionData = await response.json();
+                    const latestVersion = versionData.version;
+                    
+                    if (compareVersions(CURRENT_VERSION, latestVersion) < 0) {
+                        showUpdateDialog(latestVersion, versionData.download_url);
+                    }
+                }
+            } catch (error) {
+                console.log('Проверка обновлений не удалась:', error);
+            }
+        }
+
+        function compareVersions(current, latest) {
+            const currentParts = current.split('.').map(Number);
+            const latestParts = latest.split('.').map(Number);
+            
+            for (let i = 0; i < Math.max(currentParts.length, latestParts.length); i++) {
+                const currentPart = currentParts[i] || 0;
+                const latestPart = latestParts[i] || 0;
+                
+                if (currentPart < latestPart) return -1;
+                if (currentPart > latestPart) return 1;
+            }
+            return 0;
+        }
+
+        function showUpdateDialog(newVersion, downloadUrl) {
+            // Реализация диалога обновления
+            if (confirm(`Доступна новая версия ${newVersion}! Хотите обновиться?`)) {
+                if (downloadUrl) {
+                    window.open(downloadUrl, '_blank');
+                }
+            }
+        }
+
+        // Инициализация
+        window.onload = function() {
+            loadProducts();
+            loadNews();
+            checkForUpdates();
+            
+            // Закрытие модального окна по клику вне его
+            document.getElementById('modal').onclick = function(e) {
+                if (e.target === this) closeModal();
+            };
+        };
+    </script>
+</body>
+</html>
