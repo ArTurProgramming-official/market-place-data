@@ -165,6 +165,32 @@
             margin-bottom: 8px;
         }
 
+        /* Переключатель проектов */
+        .projects-switch {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            background: white;
+            border-radius: 25px;
+            padding: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .switch-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .switch-btn.active {
+            background: #1976d2;
+            color: white;
+        }
+
         /* Кнопки */
         .refresh-btn {
             background: #1976d2;
@@ -364,6 +390,32 @@
                 </div>
             </div>
 
+            <!-- Проекты -->
+            <div id="projects-tab" class="tab-content">
+                <div class="projects-switch">
+                    <button class="switch-btn active" onclick="switchProjectsType('unfinished')">
+                        Незавершённые
+                    </button>
+                    <button class="switch-btn" onclick="switchProjectsType('finished')">
+                        Завершённые
+                    </button>
+                </div>
+                <button class="refresh-btn" onclick="loadProjects()" id="refresh-projects">
+                    <i class="fas fa-sync"></i> Обновить
+                </button>
+                <div id="projects-loading" class="loading">
+                    <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+                    <p>Загрузка проектов...</p>
+                </div>
+                <div id="projects-error" class="error-message" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ошибка загрузки проектов</p>
+                </div>
+                <div id="projects-grid" class="products-grid" style="display: none;">
+                    <!-- Проекты будут загружены через JavaScript -->
+                </div>
+            </div>
+
             <!-- Новости -->
             <div id="news-tab" class="tab-content">
                 <button class="refresh-btn" onclick="loadNews()" id="refresh-news">
@@ -400,6 +452,10 @@
                 <i class="fas fa-shopping-cart"></i>
                 <span>Товары</span>
             </a>
+            <a href="#" class="nav-item" onclick="switchTab('projects')">
+                <i class="fas fa-code"></i>
+                <span>Проекты</span>
+            </a>
             <a href="#" class="nav-item" onclick="switchTab('news')">
                 <i class="fas fa-newspaper"></i>
                 <span>Новости</span>
@@ -430,7 +486,12 @@
         const CURRENT_VERSION = "1.1";
 
         let products = [];
+        let projects = {
+            finished: [],
+            unfinished: []
+        };
         let news = [];
+        let currentProjectsType = 'unfinished';
 
         // Функции переключения вкладок
         function switchTab(tabName) {
@@ -446,12 +507,30 @@
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            document.querySelector(`.nav-item:nth-child(${getTabIndex(tabName)})`).classList.add('active');
+            
+            const tabIndex = getTabIndex(tabName);
+            if (tabIndex > 0) {
+                document.querySelector(`.nav-item:nth-child(${tabIndex})`).classList.add('active');
+            }
         }
 
         function getTabIndex(tabName) {
-            const tabs = ['products', 'news', 'about'];
+            const tabs = ['products', 'projects', 'news', 'about'];
             return tabs.indexOf(tabName) + 1;
+        }
+
+        // Переключение типа проектов
+        function switchProjectsType(type) {
+            currentProjectsType = type;
+            
+            // Обновить активную кнопку переключателя
+            document.querySelectorAll('.switch-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.switch-btn:nth-child(${type === 'unfinished' ? 1 : 2})`).classList.add('active');
+            
+            // Отобразить проекты выбранного типа
+            displayProjects();
         }
 
         // Загрузка товаров с GitHub
@@ -518,6 +597,88 @@
                     ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.style.display='none'">` : ''}
                     <h3 class="product-name">${product.name}</h3>
                     <div class="product-price">${product.price || 'Цена не указана'} ₽</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Загрузка проектов с GitHub
+        async function loadProjects() {
+            const refreshBtn = document.getElementById('refresh-projects');
+            const loading = document.getElementById('projects-loading');
+            const error = document.getElementById('projects-error');
+            const grid = document.getElementById('projects-grid');
+
+            refreshBtn.disabled = true;
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            grid.style.display = 'none';
+
+            try {
+                // Загрузка завершённых проектов
+                const finishedResponse = await fetch(`${GITHUB_BASE}pz.json`);
+                if (finishedResponse.ok) {
+                    projects.finished = await finishedResponse.json();
+                } else {
+                    projects.finished = [];
+                }
+                
+                // Загрузка незавершённых проектов
+                const unfinishedResponse = await fetch(`${GITHUB_BASE}pn.json`);
+                if (unfinishedResponse.ok) {
+                    projects.unfinished = await unfinishedResponse.json();
+                } else {
+                    projects.unfinished = [];
+                }
+                
+                displayProjects();
+                
+            } catch (error) {
+                console.error('Ошибка загрузки проектов:', error);
+                error.style.display = 'block';
+                error.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ошибка загрузки проектов</p>
+                    <small>${error.message}</small>
+                `;
+            } finally {
+                loading.style.display = 'none';
+                refreshBtn.disabled = false;
+            }
+        }
+
+        // Отображение проектов
+        function displayProjects() {
+            const grid = document.getElementById('projects-grid');
+            const error = document.getElementById('projects-error');
+            
+            grid.innerHTML = '';
+            
+            const currentProjects = projects[currentProjectsType];
+            
+            if (currentProjects.length === 0) {
+                error.style.display = 'block';
+                error.innerHTML = `
+                    <i class="fas fa-info-circle"></i>
+                    <p>${currentProjectsType === 'finished' ? 'Завершённые' : 'Незавершённые'} проекты не найдены</p>
+                `;
+                grid.style.display = 'none';
+                return;
+            }
+            
+            error.style.display = 'none';
+            grid.style.display = 'grid';
+            
+            currentProjects.forEach(project => {
+                const card = document.createElement('div');
+                card.className = 'product-card fade-in';
+                card.onclick = () => showProjectDetail(project);
+                
+                card.innerHTML = `
+                    ${project.image ? `<img src="${project.image}" alt="${project.name}" class="product-image" onerror="this.style.display='none'">` : ''}
+                    <h3 class="product-name">${project.name}</h3>
+                    <div class="product-price">${currentProjectsType === 'finished' ? 'Завершён' : 'В разработке'}</div>
                 `;
                 
                 grid.appendChild(card);
@@ -592,7 +753,7 @@
             });
         }
 
-        // Модальное окно
+        // Модальное окно для товаров
         function showProductDetail(product) {
             const modal = document.getElementById('modal');
             const title = document.getElementById('modal-title');
@@ -621,6 +782,36 @@
             modal.classList.add('active');
         }
 
+        // Модальное окно для проектов
+        function showProjectDetail(project) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const image = document.getElementById('modal-image');
+            const text = document.getElementById('modal-text');
+            const linkBtn = document.getElementById('modal-link-btn');
+            
+            title.textContent = project.name;
+            text.textContent = project.description || 'Описание отсутствует';
+            
+            if (project.image) {
+                image.src = project.image;
+                image.style.display = 'block';
+                image.onerror = () => image.style.display = 'none';
+            } else {
+                image.style.display = 'none';
+            }
+            
+            if (project.link) {
+                linkBtn.style.display = 'block';
+                linkBtn.onclick = () => window.open(project.link, '_blank');
+            } else {
+                linkBtn.style.display = 'none';
+            }
+            
+            modal.classList.add('active');
+        }
+
+        // Модальное окно для новостей
         function showNewsDetail(newsItem) {
             const modal = document.getElementById('modal');
             const title = document.getElementById('modal-title');
@@ -690,6 +881,7 @@
         // Инициализация
         window.onload = function() {
             loadProducts();
+            loadProjects();
             loadNews();
             checkForUpdates();
             
