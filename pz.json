@@ -3,7 +3,7 @@
     "name": "Teacher Test",
     "description": "Программа для создания и прохождения тестов.",
     "image": "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/tt.jpg",
-    "image_ratio": "9-16",
+    "image_ratio": "16-9",
     "link": "https://github.com/ArTurProgramming-official/teacher-test"
   }
 ]
