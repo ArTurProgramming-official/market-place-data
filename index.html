@@ -115,10 +115,24 @@
 
         .product-image {
             width: 100%;
-            height: 180px;
             object-fit: cover;
             border-radius: 12px;
             margin-bottom: 12px;
+        }
+
+        .product-image.ratio-1-1 {
+            height: 180px;
+            aspect-ratio: 1/1;
+        }
+
+        .product-image.ratio-16-9 {
+            height: 158px;
+            aspect-ratio: 16/9;
+        }
+
+        .product-image.ratio-9-16 {
+            height: 320px;
+            aspect-ratio: 9/16;
         }
 
         .product-name {
@@ -355,6 +369,10 @@
                 width: 95%;
                 padding: 20px;
             }
+
+            .product-image.ratio-9-16 {
+                height: 240px;
+            }
         }
 
         /* Анимации */
@@ -438,7 +456,7 @@
             <div id="about-tab" class="tab-content">
                 <div class="about-content">
                     <h1 class="about-title">ArturProgramming Home</h1>
-                    <p class="about-version">Версия 1.1</p>
+                    <p class="about-version">Версия 1.2</p>
                     <a href="https://t.me/ArturProgrammer" class="about-link" target="_blank">
                         <i class="fab fa-telegram"></i> Канал: https://t.me/ArturProgrammer
                     </a>
@@ -483,7 +501,7 @@
 
     <script>
         const GITHUB_BASE = "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/";
-        const CURRENT_VERSION = "1.1";
+        const CURRENT_VERSION = "1.2";
 
         let products = [];
         let projects = {
@@ -593,8 +611,10 @@
                 card.className = 'product-card fade-in';
                 card.onclick = () => showProductDetail(product);
                 
+                const imageRatio = product.image_ratio || '1-1';
+                
                 card.innerHTML = `
-                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image" onerror="this.style.display='none'">` : ''}
+                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image ratio-${imageRatio}" onerror="this.style.display='none'">` : ''}
                     <h3 class="product-name">${product.name}</h3>
                     <div class="product-price">${product.price || 'Цена не указана'} ₽</div>
                 `;
@@ -675,8 +695,10 @@
                 card.className = 'product-card fade-in';
                 card.onclick = () => showProjectDetail(project);
                 
+                const imageRatio = project.image_ratio || '1-1';
+                
                 card.innerHTML = `
-                    ${project.image ? `<img src="${project.image}" alt="${project.name}" class="product-image" onerror="this.style.display='none'">` : ''}
+                    ${project.image ? `<img src="${project.image}" alt="${project.name}" class="product-image ratio-${imageRatio}" onerror="this.style.display='none'">` : ''}
                     <h3 class="product-name">${project.name}</h3>
                     <div class="product-price">${currentProjectsType === 'finished' ? 'Завершён' : 'В разработке'}</div>
                 `;
