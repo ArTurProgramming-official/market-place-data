@@ -64,15 +64,20 @@
             color: white;
         }
 
-        .logo-image {
+        .logo-icon {
             width: 40px;
             height: 40px;
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 12px;
-            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .logo-text {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
         }
 
@@ -326,29 +331,31 @@
             padding: 3rem 1rem;
         }
 
-        .about-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--primary);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .about-logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 24px;
+            object-fit: cover;
             margin: 0 auto 1.5rem;
-            color: white;
-            font-size: 2rem;
+            box-shadow: var(--shadow);
         }
 
         .about-title {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .about-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
         }
 
         .about-version {
             color: var(--text-secondary);
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-bottom: 2rem;
         }
 
@@ -493,11 +500,20 @@
             .modal-actions {
                 flex-direction: column;
             }
+            
+            .about-logo {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .about-title {
+                font-size: 1.5rem;
+            }
         }
 
         @media (max-width: 480px) {
             .logo-text {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
             
             .section-title {
@@ -509,12 +525,22 @@
             }
             
             .header {
-                padding: 1rem 0;
+                padding: 0.8rem 0;
             }
             
-            .logo-image {
+            .logo-icon {
                 width: 32px;
                 height: 32px;
+                font-size: 16px;
+            }
+            
+            .about-logo {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .about-title {
+                font-size: 1.3rem;
             }
         }
     </style>
@@ -525,12 +551,8 @@
         <header class="header">
             <div class="header-content">
                 <a href="#" class="logo" onclick="switchTab('products'); return false;">
-                    <img src="https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/logot.jpg" 
-                         alt="ArturProgramming" 
-                         class="logo-image"
-                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="logo-icon" style="display: none;">
-                        <i class="fas fa-code"></i>
+                    <div class="logo-icon">
+                        &lt;/&gt;
                     </div>
                     <div class="logo-text">ArturProgramming</div>
                 </a>
@@ -633,10 +655,12 @@
             <!-- About section -->
             <section id="about-section" class="content-section">
                 <div class="about-content">
-                    <div class="about-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
+                    <img src="https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/logot.jpg" 
+                         alt="ArturProgramming" 
+                         class="about-logo"
+                         onerror="this.style.display='none';">
                     <h2 class="about-title">ArturProgramming</h2>
+                    <p class="about-subtitle">Разработка программного обеспечения</p>
                     <p class="about-version">Версия 1.0</p>
                     
                     <div class="social-links">
@@ -733,7 +757,7 @@
 
             try {
                 const response = await fetch(`${GITHUB_BASE}products.json`);
-                if (!response.ok) throw new Error(`HTTP error! status: {response.status}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 
                 products = await response.json();
                 displayProducts();
@@ -866,7 +890,7 @@
 
             try {
                 const response = await fetch(`${GITHUB_BASE}news.json`);
-                if (!response.ok) throw new Error(`HTTP error! status: {response.status}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 
                 news = await response.json();
                 displayNews();
@@ -986,4 +1010,4 @@
         };
     </script>
 </body>
-    </html>
+</html>
