@@ -118,10 +118,14 @@ function createCard(type, id, data) {
 async function loadCollection(type) {
     const grid = document.getElementById(type + '-grid');
     grid.innerHTML = '';
-    let colNames = type==='project' ? ['projects_unfinished','projects_finished'] : [type];
+    const colNames = type==='project' ? ['projects_unfinished','projects_finished'] : [type];
     for(const colName of colNames){
-        const snapshot = await getDocs(collection(db, colName));
-        snapshot.forEach(docSnap => grid.appendChild(createCard(type, docSnap.id, docSnap.data())));
+        try {
+            const snapshot = await getDocs(collection(db, colName));
+            snapshot.forEach(docSnap => grid.appendChild(createCard(type, docSnap.id, docSnap.data())));
+        } catch(e) {
+            addLog(`Ошибка при загрузке ${type}: ${e.message}`);
+        }
     }
 }
 
@@ -153,22 +157,22 @@ function openEditModal(type, id, data) {
 function closeModal() { document.getElementById('modal').classList.remove('active'); }
 
 // --- Save / Delete ---
-document.getElementById('modal-save-btn').onclick = async () => {
+async function saveItem() {
     const name = document.getElementById('modal-name').value;
     const description = document.getElementById('modal-description').value;
     const image = document.getElementById('modal-image').value;
     const link = document.getElementById('modal-link').value;
-    let type = currentEdit.type;
-    let id = currentEdit.id;
-    let colName = type==='project' ? document.getElementById('modal-project-type').value : type;
+    const type = currentEdit.type;
+    const id = currentEdit.id;
+    const colName = type==='project' ? document.getElementById('modal-project-type').value : type;
 
+    const data = { name, description, image, link };
     try {
         if(id) {
-            await updateDoc(doc(db, colName, id), { name, description, image, link });
+            await updateDoc(doc(db, colName, id), data);
             addLog(`Изменён ${type} "${name}" (ID: ${id})`);
-        }
-        else {
-            const docRef = await addDoc(collection(db, colName), { name, description, image, link });
+        } else {
+            const docRef = await addDoc(collection(db, colName), data);
             addLog(`Добавлен ${type} "${name}" (ID: ${docRef.id})`);
         }
         closeModal();
@@ -177,13 +181,14 @@ document.getElementById('modal-save-btn').onclick = async () => {
         addLog(`Ошибка при сохранении ${type}: ${e.message}`);
         alert('Ошибка при сохранении. Смотри логи.');
     }
-};
+}
 
-document.getElementById('modal-delete-btn').onclick = async () => {
+async function deleteItem() {
     const type = currentEdit.type;
     const id = currentEdit.id;
     const colName = type==='project' ? document.getElementById('modal-project-type').value : type;
-    if(id && confirm('Удалить элемент?')) {
+    if(!id) return;
+    if(confirm('Удалить элемент?')) {
         try {
             await deleteDoc(doc(db, colName, id));
             addLog(`Удалён ${type} (ID: ${id})`);
@@ -194,7 +199,10 @@ document.getElementById('modal-delete-btn').onclick = async () => {
             alert('Ошибка при удалении. Смотри логи.');
         }
     }
-};
+}
+
+document.getElementById('modal-save-btn').onclick = saveItem;
+document.getElementById('modal-delete-btn').onclick = deleteItem;
 
 // --- Initial load ---
 loadCollection('product');
