@@ -5,12 +5,5 @@
     "image": "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/exe.jpg",
     "price": "от 490",
     "link": "https://t.me/ArturProgramming"
-  },
-  {
-    "name": "Разработка приложения на Android",
-    "description": "Разработка приложения в apk файле. Современный дизайн, доступ к интернету – это то что будет у приложения. Цена от 990 рублей.",
-    "image": "https://raw.githubusercontent.com/ArTurProgramming-official/market-place-data/main/images/apk.jpg",
-    "price": "от 990",
-    "link": "https://t.me/ArturProgramming"
   }
 ]
