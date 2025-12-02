@@ -1,1 +1,197 @@
-hi
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ArturProgramming</title>
+
+  <style>
+    :root{
+      --blue:#0b63d6;
+      --bg:#f4f6fa;
+      --card:#fff;
+      font-family: Arial, sans-serif;
+    }
+
+    body{margin:0;background:var(--bg)}
+
+    /* Верхняя синяя полоса */
+    .topbar{
+      background:var(--blue);
+      color:white;
+      padding:16px;
+      font-size:22px;
+      font-weight:700;
+    }
+
+    /* Навигация */
+    nav.tabs{
+      padding:14px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    @media(max-width:600px){
+      nav.tabs{
+        grid-template-columns:repeat(2,1fr);
+      }
+    }
+
+    .tab{
+      padding:10px;
+      border-radius:10px;
+      border:2px solid var(--blue);
+      background:white;
+      font-weight:600;
+      color:var(--blue);
+      cursor:pointer;
+      text-align:center;
+      transition:0.2s;
+    }
+    .tab.active{
+      background:var(--blue);
+      color:white;
+    }
+
+    .container{
+      max-width:900px;
+      margin:auto;
+      padding:16px;
+    }
+
+    .section{
+      display:none;
+      padding:18px;
+      background:var(--card);
+      border-radius:12px;
+      box-shadow:0 3px 12px rgba(0,0,0,0.1);
+    }
+    .section.active{display:block}
+
+    /* Желания */
+    .wish{
+      display:flex;
+      gap:12px;
+      margin-bottom:20px;
+      align-items:flex-start;
+    }
+
+    .wish img{
+      width:80px;
+      height:80px;
+      border-radius:10px;
+      object-fit:cover;
+      border:1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">ArturProgramming</div>
+
+  <nav class="tabs">
+    <button class="tab active" data-target="wishes">Желания</button>
+    <button class="tab" data-target="hate">Не люблю</button>
+    <button class="tab" data-target="love">Люблю</button>
+    <button class="tab" data-target="about">О мне</button>
+  </nav>
+
+  <div class="container">
+
+    <section id="wishes" class="section active">
+      <h2>Желания</h2>
+      <div id="wishesList"></div>
+    </section>
+
+    <section id="hate" class="section">
+      <h2>Не люблю</h2>
+      <div id="hateList"></div>
+    </section>
+
+    <section id="love" class="section">
+      <h2>Люблю</h2>
+      <div id="loveList"></div>
+    </section>
+
+    <section id="about" class="section">
+      <h2>О мне</h2>
+      <div id="aboutBlock"></div>
+    </section>
+
+  </div>
+
+<script>
+/* ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК */
+const tabs = document.querySelectorAll(".tab");
+const sections = document.querySelectorAll(".section");
+
+tabs.forEach(tab=>{
+  tab.onclick=()=>{
+    tabs.forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+
+    const id = tab.dataset.target;
+    sections.forEach(s=>s.classList.toggle("active", s.id === id));
+  }
+});
+
+/* ЗАГРУЗКА JSON */
+
+/* 1 — Люблю (lk.json) */
+fetch("lk.json")
+  .then(res=>res.json())
+  .then(data=>{
+    let html = "";
+    data.forEach(item=>{
+      html += `<p><b>${item.имя}</b><br>${item.описание}</p>`;
+    });
+    document.getElementById("loveList").innerHTML = html;
+  });
+
+/* 2 — Не люблю (dslk.json) */
+fetch("dslk.json")
+  .then(res=>res.json())
+  .then(data=>{
+    let html = "";
+    data.forEach(item=>{
+      html += `<p><b>${item.имя}</b><br>${item.описание}</p>`;
+    });
+    document.getElementById("hateList").innerHTML = html;
+  });
+
+/* 3 — О мне (abt.json) */
+fetch("abt.json")
+  .then(res=>res.json())
+  .then(a=>{
+    document.getElementById("aboutBlock").innerHTML = `
+      <p><b>Имя:</b> ${a.имя}</p>
+      <p><b>Увлекаюсь:</b> ${a.увлекаюсь}</p>
+      <p><b>День рождения:</b> ${a.др}</p>
+      <p><b>Реклама:</b> ${a.реклама}</p>
+      <p><a href="${a.рекламассылка}" target="_blank">Перейти по ссылке</a></p>
+    `;
+  });
+
+/* 4 — Желания (wsh.json) */
+fetch("wsh.json")
+  .then(res=>res.json())
+  .then(wishes=>{
+    let html = "";
+    wishes.forEach(w=>{
+      html += `
+        <div class="wish">
+          <img src="${w["Фото"]}" alt="">
+          <div>
+            <b>${w["Название"]}</b><br>
+            ${w["Почему"]}<br>
+            ${w["Ссылка"] ? `<a href="${w["Ссылка"]}" target="_blank">Ссылка</a>` : ""}
+          </div>
+        </div>
+      `;
+    });
+    document.getElementById("wishesList").innerHTML = html;
+  });
+</script>
+
+</body>
+</html>
